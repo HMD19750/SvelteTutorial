@@ -1,4 +1,5 @@
 <script>
+	import AddPersonFile from './AddPersonFile.svelte';
 	import Modal from './Modal.svelte'
 
 	let showModal=false;
@@ -17,9 +18,18 @@
 	const toggleModal= () => {
 		showModal=!showModal;
 	}
+
+	const addPerson=(e)=>{
+		let person=e.detail;
+		people=[person,...people];
+		showModal=false;  // Close modal
+	}
 </script>
 
-<Modal message="Hi, I am a prop value!" isPromo={false} showModal={showModal} on:click={toggleModal}/>
+<Modal  isPromo={false} showModal={showModal} on:click={toggleModal}>
+	<AddPersonFile on:addPerson={addPerson}/>
+</Modal>
+
 <main>
 
 	<button on:click={toggleModal}>Open Modal</button>
