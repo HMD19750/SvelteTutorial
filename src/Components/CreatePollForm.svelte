@@ -1,5 +1,7 @@
 <script>
-    import Button from "../Shared/Button.svelte"
+    import Button from "../Shared/Button.svelte";
+    import {createEventDispatcher} from "svelte";
+    let dispatch=createEventDispatcher();
 
     let fields={question: '',answerA:'',answerB:''};
     let errors={question: '',answerA:'',answerB:''};
@@ -14,6 +16,7 @@
             errors.question="The question is nog long enough";
         } else {
             errors.question="";
+            valid=true;
         }
 
         //Validate answer A
@@ -22,6 +25,7 @@
             errors.answerA="Answer A cannot be empty";
         } else {
             errors.answerA="";
+            valid=true;
         }        
 
         //Validate answer B
@@ -30,13 +34,17 @@
             errors.answerB="Answer B cannot be empty";
         } else {
             errors.answerB="";
+            valid=true;
         }
-    }
+    
 
     //add new poll
     if(valid){
-        console.log('valid',fields)
+        let poll={...fields,votesA : 0, votesB : 0,id : Math.random()};
+
+        dispatch('add',poll);
     }
+}
 </script>
 
 
