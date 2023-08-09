@@ -1,13 +1,22 @@
 <script>
      import PollStore from "../Stores/PollStore.js"
      import Card from "../Shared/Card.svelte";
+     import Button from "../Shared/Button.svelte";
+     import {tweened} from "svelte/motion";
 
     export let poll;
 
     // Reactive values
     $: votes=poll.votesA+poll.votesB;
-    $: percentA=Math.floor(100/votes*poll.votesA);
-    $: percentB=Math.floor(100/votes*poll.votesB);
+    $: percentA=Math.floor(100/votes*poll.votesA)||0; // De nul is om te voorkomen dat waarde onbepaald is bij creeren nieuwe poll
+    $: percentB=Math.floor(100/votes*poll.votesB)||0;
+
+    // Tweened percentages
+    const tweenedA=tweened(0);
+    const tweenedB=tweened(0);
+
+    $: tweenedA.set(percentA);
+    $: tweenedB.set(percentB);
 
 
     const handleVote=(option,id)=> {
@@ -24,6 +33,14 @@
             return copiedPolls;
             })
 	}
+
+    // deleting a poll
+    const handleDelete = (id) => {
+        console.log("Delete poll");
+        PollStore.update(polls => {
+        return polls.filter(poll => poll.id != id);
+        });
+    };
 </script>
 
 <Card>
@@ -31,21 +48,24 @@
         <h3>{poll.question}</h3>
         <p>Total votes: {votes}</p>
         <div class="answer" on:click={()=>handleVote('a',poll.id)}>
-            <div class="percent percent-a" style="width:{percentA}%">
+            <div class="percent percent-a" style="width:{$tweenedA}%">
             </div>
             <span>
                 {poll.answerA} ({ poll.votesA })
             </span>
         </div>
         <div class="answer" on:click={()=>handleVote('b',poll.id)}>
-            <div class="percent percent-b" style="width:{percentB}%">
+            <div class="percent percent-b" style="width:{$tweenedB}%">
             </div>
             <span>
                 {poll.answerB} ({ poll.votesB })
             </span>
         </div>
     </div>
-</Card>
+    <div class="delete">
+        <Button flat={true} on:click={() => handleDelete(poll.id)}>Delete</Button>
+      </div>
+   </Card>
 
 <style>
 h3{
@@ -90,5 +110,10 @@ span {
 .percent-b {
     background:rgba(69,196,150,0.2);
     border-left: 4px solid #45c496;
+}
+
+.delete {
+    margin-top:30px;
+    text-align: center;
 }
 </style>
